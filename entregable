@@ -1,0 +1,105 @@
+const fs = require('fs');
+
+class ProductManager {
+    constructor(path) {
+        this.path = path;
+    }
+
+
+    async addProduct(product) {
+        try {
+            const products = await
+    this.getProducts();
+                product.id = products.length > 0 ?
+            products[products.length - 1]. id + 1 : 1;
+            
+            products.push(product);
+            await
+            this.saveProduct(products);
+            return product.id;
+        } catch (error) {
+            throw new Error('Error adding product: ' + error.message);
+        }
+    }
+
+
+
+    async getProducts() {
+        try {
+            const data = await
+            fs.promises.readFile(this.path, 'utf8');
+            return JSON.parse(data);
+        } catch (error) {
+            if (error.code === 'ENOENT') {
+                return [];
+            } 
+            throw new Error('Error reading products:' + error.message);
+        }
+    }
+
+
+
+    async updateProduct(id, updatedFiels) {
+        try {
+             const products = await
+this.getProducts();
+             const index = products.fidIndex(product => product.id === id);
+
+             if (index !== -1) {
+                products[index] =
+                {...products[index], updatedFields};
+                      await
+        this.saveProducts(products);
+                         return true;
+             }
+             return false
+        } catch (error) {
+            throw new Error('Error updating product:' + error.message);
+        }
+    }
+
+
+    async deleteProduct(id) {
+        try {
+            const products = await
+    this.getProducts();
+            const updatedProducts = products.filter(product => product.id !== id);
+             
+            await
+            this.saveProducts(updatedProducts);
+            return true;
+        } catch (error) {
+            throw new Error('Error saving products:' + error.messge);
+        }
+    }
+}
+
+
+     const productManager = new ProductManager.addProduct('products.json');
+
+     
+     const productId = await
+     productManager.addProduct({
+        title: 'television',
+        description: 'en buen estado',
+        price: 30.99,
+        thumbnail: 'path/to/thumbnail.jpg',
+        code: '2345',
+        stock: 50
+     });
+     console.log('producto añadido co ID:', productId);
+
+
+
+     const updated = await 
+     productManager.updateProduct(1, { price:
+    24.99 });
+
+    console.log('producto actualizado:', updated);
+
+
+    const deleted = await 
+    productManager.deleteProduct(1);
+    console.log('producto eliminado:', deleted);
+
+    
